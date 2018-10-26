@@ -49,8 +49,7 @@ power() // 256
 
 ## MapReducer
 
-Function, which creates map reducer function for `int` arguments passesd 
-Функция, която създава map reducer функция за `int` аргументи с подадени [map](https://en.wikipedia.org/wiki/Map_(higher-order_function)) function, [reduce](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) function and the inital value 
+Function, which creates map reducer function for `int` arguments passesd [map](https://en.wikipedia.org/wiki/Map_(higher-order_function)) function, [reduce](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) function and the inital value 
 `initial` for the reduce function.
 
 ```
@@ -70,8 +69,6 @@ powerSum(1, 2, 3, 4) // 30
 ```
 
 The arguments of the `reducer` function should be passed from left to the right or with other words create a [left-fold](https://en.wikipedia.org/wiki/Fold_(higher-order_function)#On_lists) implementation of the reduce function.
-
-Аргументите на `reducer` трябва да се подават от ляво на дясно. Иначе казано - напишете [left-fold](https://en.wikipedia.org/wiki/Fold_(higher-order_function)#On_lists) във вашата имплементация.
 
 ## Reminder
 
