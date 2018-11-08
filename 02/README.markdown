@@ -1,13 +1,14 @@
 # Piece table
 
-В тази задача ще трябва да имплементирате основната функционалност на един
-потенциален текстови редактор. Той трябва да може да работи с подадено
-съдържание на въображаем файл, да предоставя неговото съдържание, да позволява
-редактиране, undo и redo.
+In this task you will have to implement the main functionality of one text editor.
+He has to work on the on the potential content of a file and give the ability to inser, delete text and undo and redo operations.
 
-Една от популярните структури за имплементиране на тази функционалност е [piece
-table](https://en.wikipedia.org/wiki/Piece_table) (на места можете да я
-срещтнете и като piece chain).
+One famous structure for implementation of this funcionality is piece
+table](https://en.wikipedia.org/wiki/Piece_table) (in some places you can find it as a piece chain).
+
+For the implementation you need two buffers:
+
+- First one (file buffer) 
 
 За имплементацията на таблицата, са ни нужни два буфера:
 
