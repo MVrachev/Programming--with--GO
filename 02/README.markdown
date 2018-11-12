@@ -8,22 +8,13 @@ table](https://en.wikipedia.org/wiki/Piece_table) (in some places you can find i
 
 For the implementation you need two buffers:
 
-- First one (file buffer) 
+- First one (file buffer) contains the original content of the file. The file buffer is immutable (read-only). In this task we will call it "origin".
 
-За имплементацията на таблицата, са ни нужни два буфера:
+- The second buffer contains only the additional content of the file added by insertion. The content of this buffer can only grow, once data is added there it's never deleted (append-only). In this task we will call it "add".
 
-- Първият (file buffer) съдържа целият зареден файл, преди всякакви редакции.
-  Той никога не търпи промени в процеса на работа (read-only). В рамките на
-  тази задача ще го наричаме "origin".
+The table will contains "pieces" which will relate to a part of the file based on that in which buffer they are located.
+We can present one piece with the following structure:
 
-- Вторият буфер съдържа само добавеното съдържание във файла. Съдържанието на
-  този буфер може само да расте, веднъж добавени данни там, те не търпят
-  изтриване в процеса на работа (append-only). В рамките на тази задача ще
-  го наричаме "add".
-
-Таблицата съдържа "парчета", които описват част от съдържание във файла, въз
-основа на това, в кой буфер се намират. Едно парче можем да представим със
-следната структура:
 
 	struct {
 		origin bool
@@ -31,46 +22,43 @@ For the implementation you need two buffers:
 		length int
 	}
 
-- origin указва дали съдържанието, към което сочи се намира в origin буфера.
+- origin says does the content of the piece belongs to the origin buffer.
 
-- offset указва от кой **байт** в горепосочения буфер започва съдържанието на
-  това парче.
+- offset gives us the from which **byte** in the в aforenamed buffer starts the content of that piece
 
-- length указва дължината на въпросното съдържание.
+- length gives us the length of the piece.
 
-При първоначалното отваряне на даден файл целият файл се описва от едно парче,
-което е единственият запис в таблицата.
+In the begging when opening a file the whole fyle is saved in one piece, which is the only record in the table.
 
-### Пример:
+### Example:
 
-Отваряме файл със съдържание `A large span of text`. Origin буферът изглежда така:
+We open a file with the content `A large span of text`. The origin buffer looks like this:
 
 ![origin](./images/origin.png)
 
-Add буферът е празен, а таблицата с парчета изглежда така:
-
+The add buffer is empty and the table looks like this:
 
 ![table0](./images/table0.png)
 
-Потребителят решава да добави думата "English" преди последната дума, за да
-получи файл със съдържание: `A large span of English text`. Добавяме в add буфера `English `:
+The user decides to add the word "English" before the last word to get a file with the content: `A large span of English text`. We add `English ` in the add buffer.
 
 ![add](./images/add.png)
 
-Обърнете внимание, че  размерът на add буфера е по-голям от необходимото. Това
-е допустимо, но не задължително. Таблицата ни вече изглежда така:
+Note that the size of the add buffer is larger than the necessary. That's okay but it's not mandatory. 
+The table now looks like this: 
 
 ![table1](./images/table1.png)
 
-Въображаемият ни потребител решава да изтрие думата `large`. Това не води до
-никакви промени в нашите буфери, тъй като нищо никога не се трие от тях.
-Таблицата се променя до:
+Our user decides to delete the word `large`. This doesn't lead to any changes in our buffers and doesn't delete anything from them because we can't delete from the buffers.
+
+The table changes into this: 
 
 ![table2](./images/table2.png)
 
-## Задача
+## The task
 
-Задачата ви е да създадете тип, който имплементира следния интерфейс:
+Your task is to implement a type which implements the following interface:
+
 
 	type Editor interface {
 		// Insert text starting from given position.
@@ -79,26 +67,20 @@ Add буферът е празен, а таблицата с парчета из
 		// Delete length items from offset.
 		Delete(offset, length uint) Editor
 
-		// Undo reverts latest change.
-		Undo() Editor
-
-		// Redo re-applies latest undone change.
-		Redo() Editor
-
 		// String returns complete representation of what a file looks
 		// like after all manipulations.
 		String() string
 	}
 
-Също така се очаква и да добавите функция, която създава стойност на вашия тип,
-от подаден origin буфер.
+Also you are expected to create a function, which gives value to your own type from the given origin buffer.
+
 
 	func NewEditor(string) Editor
 
-### Пример
+### An example
 
-Горният пример би трябвало да може да бъде пресъздаден с помощта на вашата
-имплементация по този начин:
+The example before we can reproduce with your implementation like this: 
+
 
 	var f = NewEditor("A large span of text")
 	f.String() // "A large span of text"
@@ -109,38 +91,21 @@ Add буферът е празен, а таблицата с парчета из
 	f = f.Delete(2, 6)
 	f.String() // "A span of English text"
 
-## Забележки/Препоръки:
+## Notes / Recommendations:
 
-- *Внимание*: когато предавате решение, трябва да включите в него дефиницията
-  на `Editor` интерфейса, за да успеете да предадете решението си.
-- Обърнете внимание, че никой от методите не връща грешка. Това ще рече, че
-  очакваме да се справяте с твърде големи стойности на position, offset и
-  length:
-    - Твърде голяма стойност на position при Insert трябва да се държи като
-      обикновено добавяне на края на файла.
-      `NewEditor("foo").Insert(453, ".")` трябва да се държи като
+- Note that the functions doesn't return an error. That means that we expect from you to handle with too big values of position, offset and length:
+    - Too big value of position in Insert should act like a normal Insert into the end of the file: 
+      `NewEditor("foo").Insert(453, ".")` should work as:
       `NewEditor("foo").Insert(3, ".")`.
-    - Твърде голяма стойност на offset при Delete не трябва променя файла.
-      Тази операция не прави нищо:
+    - Too big value of the offest in Delete shouldn't change the file. 
+      This operation doesn't do anything:
       `NewEditor("foo").Delete(300, 1)`
-    - Твърде голяма стойност на length при Delete трябва да стига до края
-      на файла. `NewEditor("foo").Delete(1, 300)` трябва да се държи като
+    - Too big value of length in Delete should go to the end of the file
+      `NewEditor("foo").Delete(1, 300)` should act like this:
       `NewEditor("foo").Delete(1, 2)`.
-- Обърнете внимание на факта, че всеки един от методите връща редактор. Това
-  все пак **не** означава, че е задължително да създавате нов редактор, който
-  да връщате. Решението дали да го правите, или да мутирате текущия е ваше.
-- add буферът може да расте до безкрайност.
-- Не се фокусирайте да оптимизирате тези алокации особено много. Напълно ок е
-  да решите, че по подразбиране add буферът е X символа и ако се налага просто
-  удвоява размера си.
-- При отваряне на файл add буферът е празен и е напълно в реда на нещата дори
-  да не е алокиран (т.е. да е nil).
-- Вашият тип **не трябва** да се казва `Editor`, тъй като вече имате такъв
-  дефиниран интерфейс в sample тестовете. Напълно допустимо е този тип да не
-  бъде exported.
-- Undo преди извършена операция не трябва да прави нищо.
-- Redo преди изпълнено Undo (или след всички възможни Redo-та) не трябва да
-  прави нищо.
-- След Undo всяка редакция се предполага да инвалидира следваща Redo операция.
-- Операциите Insert и Delete очакват position, offset и length в **байтове**, а
-  не в символи. Обърнете внимание на това при работа с unicode символи.
+- Note that every method returns an editor. This still doesn't mean that is mandatory to create a new editor which you will return. The descision is yours to change the existing editor or to create a new one in every operation. 
+- add can grow infinitely.
+- Don't focus to optimize the allocation too much. 
+- When opening a new few its okay the add buffer to be nul
+- Your type **should not** be caled `Editor`, because you already have defined one in the sample tests.
+- The Insert and Delete operation expects the position, offset and length in **bytes** not in symbols. Note this when working with unicode symbols.
