@@ -3,7 +3,7 @@
 In this task you will have to implement the main functionality of one text editor.
 He has to work on the on the potential content of a file and give the ability to inser, delete text and undo and redo operations.
 
-One famous structure for implementation of this funcionality is piece
+One famous structure for implementation of this funcionality is [piece
 table](https://en.wikipedia.org/wiki/Piece_table) (in some places you can find it as a piece chain).
 
 For the implementation you need two buffers:
